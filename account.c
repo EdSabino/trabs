@@ -67,6 +67,36 @@ void _insert_account() {
         strcat(final, partial);
         account_partial_last = account_partial;
     }
+    _add_to_index(account, name);
+    fprintf(pfile, "%s", final);
+    fclose(pfile);
+}
+
+void _add_to_index(int account, char *name) {
+    FILE *pfile_index;
+    pfile_index = _find_right_index(account);
+    int file;
+    if (account % 500 == 0) {
+        file = account / 500;
+    } else {
+        file = (account / 500) + 1;
+    }
+    char *str = (char*)malloc(30 * sizeof(char));
+    char name_partial[1000];
+    char name_partial_last[1000];
+    char final[1000];
+    char partial[1000];
+    int file_partial;
+    while (fscanf(pfile_index,"%s->%i/", name_partial, &file_partial)==1) {
+        if (name_partial_last < name && name_partial > name) {
+            sprintf(partial, "%s->&i", name, file);
+            strcat(final, partial);
+            more = 1;
+        }
+        sprintf(partial, "%s->%i", name, file_partial);
+        strcat(final, partial);    
+        name_partial_last = name_partial;
+    }
     fprintf(pfile, "%s", final);
     fclose(pfile);
 }
@@ -80,6 +110,19 @@ FILE *_find_right_file(int account) {
     }
     char *str = (char*)malloc(30 * sizeof(char));
     sprintf(str, "banks/files/%i.ss", file);
+    return fopen(str, "at+");
+}
+
+FILE *_find_right_index(int account) {
+    int file;
+    if (account % 500 == 0) {
+        file = account / 500;
+    } else {
+        file = (account / 500) + 1;
+    }
+    char *str = (char*)malloc(30 * sizeof(char));
+    sprintf(str, "banks/index/%i.ss", file);
+    free(str);
     return fopen(str, "at+");
 }
 
@@ -110,20 +153,33 @@ void _find_account_by_name() {
     getchar();
     fgets(name, 1000, stdin);
     _strip_string(name);
-    int i = 0;
-    int must_break == 0;
-        while (must_break == 0) {
-            sprintf(str, "banks/files/%i.ss", file);
-            pfile = fopen(str, "at+");
-            while (fscanf(pfile,"%i;%s;%f/", &account_partial, name_partial, &value_partial)==1) {
-                if (name_partial == name) {
-                    must_break = 1;
-                    break;
-                }
-            }
-            i++;
+    pfile = _find_on_index(name);
+    while (fscanf(pfile,"%i;%s;%f/", &account_partial, name_partial, &value_partial)==1) {
+        if (name_partial == name) {
+            break;
         }
-        printf("Conta: %i\n Nome: %s\n Saldo: %f\n", account_partial, name_partial, value_partial);
+    }
+    printf("Conta: %i\n Nome: %s\n Saldo: %f\n", account_partial, name_partial, value_partial);
+}
+
+FILE *_find_on_index(char *name) {
+    char *str = (char*)malloc(30 * sizeof(char));
+    char name_partial[1000];
+    int file;
+    int must_break = 0;
+    while (must_break == 0) {
+        sprintf(str, "banks/index/%i.ss", file);
+        pfile = fopen(str, "at+");
+        while (fscanf(pfile,"%s->%i/", name_partial, &file)==1) {
+            if (name_partial == name) {
+                must_break = 1;
+                break;
+            }
+        }
+    }
+    sprintf(str, "banks/files/%i.ss", file);
+    free(str);
+    return fopen(str, "at+");
 }
 
 void _find_account_by_number(char *name_partial, int *account_partial, double *value_partial) {
