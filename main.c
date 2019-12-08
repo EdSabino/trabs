@@ -21,18 +21,25 @@ void create_menu(int value) {
             insert_account();
             break;
         case 2:
+            find_account_by_name();
             break;
         case 3:
+            find_account_by_number();
             break;
         case 4:
+            update_value();
             break;
         case 5:
+            update_account();
             break;
         case 6:
+            list_all();
             break;
         case 7:
+            sum_all();
             break;
         case 8:
+            delete_account();
             break;
         case 9:
             break;

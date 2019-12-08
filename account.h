@@ -3,16 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct account {
-    int number;
-    char *name;
-    double value;
-};
-
-typedef struct account Account;
-
 void insert_account();
 
-void free_account();
+void find_account_by_name();
+
+void find_account_by_number();
+
+void update_value();
+
+void update_account();
+
+void list_all();
+
+void sum_all();
+
+void delete_account();
 
 #endif
